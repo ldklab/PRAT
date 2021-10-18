@@ -1,5 +1,3 @@
-Klee Docker For PRAT
-
 FROM klee/llvm:90_O_D_A_ubuntu_bionic-20200807 as llvm_base
 FROM klee/gtest:1.7.0_ubuntu_bionic-20200807 as gtest_base
 FROM klee/uclibc:klee_uclibc_v1.2_90_ubuntu_bionic-20200807 as uclibc_base
@@ -48,6 +46,7 @@ RUN apt update && DEBIAN_FRONTEND=noninteractive apt -y --no-install-recommends 
 
 # Copy across source files needed for build
 COPY --chown=klee:klee . /tmp/klee_src/
+COPY --chown=klee:klee ./PRAT /home/klee/PRAT/
 
 # Build and set klee user to be owner
 RUN /tmp/klee_src/scripts/build/build.sh --debug --install-system-deps klee && chown -R klee:klee /tmp/klee_build* && pip3 install flask wllvm && \
@@ -61,7 +60,12 @@ RUN apt-get install -y python-pygments
 RUN apt-get install -y git
 RUN pip3 install toml
 RUN pip3 install pandas
+RUN apt-get install -y yasm
+RUN apt-get install -y mlocate
+RUN updatedb
 RUN pip install boofuzz
+# RUN ln -s /usr/bin/clang-9 /usr/bin/clang
+# RUN LD_LIBRARY_PATH=/usr/local/lib
 # RUN cd /home/klee/
 # RUN git clone https://github.com/RiS3-Lab/PRAT.git -b demo
 # RUN git clone https://github.com/williamsryan/mosquitto.git -b feature.llvm-9
